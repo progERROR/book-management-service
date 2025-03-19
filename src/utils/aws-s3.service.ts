@@ -4,8 +4,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AwsS3Service {
-  private logger = new Logger(AwsS3Service.name);
-  private s3: S3;
+  private readonly logger = new Logger(AwsS3Service.name);
+  private readonly s3: S3;
   private readonly bucketName;
 
   constructor(
@@ -15,12 +15,12 @@ export class AwsS3Service {
     this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
   }
 
-  public async uploadBookContent(bookId: string, content: string): Promise<string> {
+  public async uploadBookContent(content: string): Promise<string> {
     try {
       const uploadedResult = await this.s3.upload({
         Bucket: this.bucketName,
         Body: content,
-        Key: `${bookId}.txt`
+        Key: `${Date.now()}.txt`
       }).promise();
 
       return uploadedResult.Key;
@@ -30,10 +30,10 @@ export class AwsS3Service {
     }
   }
 
-  public async getFileContent(bucketName: string, fileKey: string): Promise<string> {
+  public async getFileContent(fileKey: string): Promise<string> {
     try {
       const params = {
-        Bucket: bucketName,
+        Bucket: this.bucketName,
         Key: fileKey,
       };
 
@@ -45,7 +45,7 @@ export class AwsS3Service {
 
       return data.Body.toString();
     } catch (error) {
-      console.error("Error fetching file:", error);
+      this.logger.error("Error fetching file:", error);
       throw error;
     }
   }

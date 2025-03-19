@@ -7,7 +7,7 @@ export enum UserRole {
 }
 
 @Entity()
-class Url {
+class User {
   @PrimaryGeneratedColumn()
   public id: number;
 
@@ -22,4 +22,4 @@ class Url {
 
 }
 
-export default Url;
+export default User;

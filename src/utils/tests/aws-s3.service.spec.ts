@@ -29,18 +29,18 @@ describe('AwsS3Service', () => {
 
   describe('uploadBookContent', () => {
     it('should upload content and return the key', async () => {
-      const bookId = '123';
       const content = 'Sample content';
+      const currentTs = Date.now();
       (s3Mock.upload as jest.Mock).mockReturnValue({
-        promise: jest.fn().mockResolvedValue({ Key: `${bookId}.txt` }),
+        promise: jest.fn().mockResolvedValue({ Key: `${currentTs}.txt` }),
       });
 
-      const result = await service.uploadBookContent(bookId, content);
-      expect(result).toBe('123.txt');
+      const result = await service.uploadBookContent(content);
+      expect(result).toBe(`${currentTs}.txt`);
       expect(s3Mock.upload).toHaveBeenCalledWith({
         Bucket: 'test-bucket',
         Body: content,
-        Key: '123.txt',
+        Key: `${currentTs}.txt`,
       });
     });
   });
@@ -51,7 +51,7 @@ describe('AwsS3Service', () => {
         promise: jest.fn().mockResolvedValue({ Body: Buffer.from('File content') }),
       });
 
-      const content = await service.getFileContent('test-bucket', 'file.txt');
+      const content = await service.getFileContent('file.txt');
       expect(content).toBe('File content');
       expect(s3Mock.getObject).toHaveBeenCalledWith({
         Bucket: 'test-bucket',
@@ -64,7 +64,7 @@ describe('AwsS3Service', () => {
         promise: jest.fn().mockResolvedValue({}),
       });
 
-      await expect(service.getFileContent('test-bucket', 'file.txt'))
+      await expect(service.getFileContent('file.txt'))
         .rejects.toThrow(NotFoundException);
     });
   });

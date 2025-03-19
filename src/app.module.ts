@@ -1,9 +1,13 @@
 import { Module } from '@nestjs/common';
-import Joi from '@hapi/joi';
+import * as Joi from '@hapi/joi';
 import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { DbModule } from './db/db.module';
 import { DynamodbModule } from './dynamodb/dynamodb.module';
+import { BookModule } from './book/book.module';
+import { UtilsModule } from './utils/utils.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -29,8 +33,14 @@ import { DynamodbModule } from './dynamodb/dynamodb.module';
     RedisModule,
     DbModule,
     DynamodbModule,
+    BookModule,
+    UtilsModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      playground: true,
+    })
   ],
-  controllers: [],
   providers: [],
 })
 export class AppModule {}

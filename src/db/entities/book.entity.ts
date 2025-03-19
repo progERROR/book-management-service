@@ -1,18 +1,20 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-class Url {
+class Book {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
   @Column()
+  @Index()
   public title: string;
 
   @Column()
   public contentReference: string;
 
   @Column()
+  @Index()
   public author: string;
 }
 
-export default Url;
+export default Book;

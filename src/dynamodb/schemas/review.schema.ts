@@ -15,3 +15,13 @@ export const ReviewSchema = new Schema({
     type: String,
   },
 });
+
+export interface ReviewKey {
+  id: string;
+}
+
+export interface Review extends ReviewKey{
+  bookId: string;
+  userName: string;
+  content: string;
+}
