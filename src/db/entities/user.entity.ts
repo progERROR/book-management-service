@@ -18,6 +18,9 @@ class User {
   public role: string;
 
   @Column()
+  password: string;
+
+  @Column()
   public username: string;
 
 }

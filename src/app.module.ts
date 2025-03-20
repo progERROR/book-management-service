@@ -8,6 +8,8 @@ import { BookModule } from './book/book.module';
 import { UtilsModule } from './utils/utils.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { AuthModule } from './auth/auth.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
         DYNAMO_ACCESS_KEY_ID: Joi.string().required(),
         DYNAMO_SECRET_ACCESS_KEY: Joi.string().required(),
         DYNAMO_REGION: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRES_IN: Joi.string().required(),
       }),
     }),
     RedisModule,
@@ -39,7 +43,12 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       driver: ApolloDriver,
       autoSchemaFile: true,
       playground: true,
-    })
+    }),
+    AuthModule,
+    ThrottlerModule.forRoot([{
+      ttl: 60,
+      limit: 10,
+    }])
   ],
   providers: [],
 })

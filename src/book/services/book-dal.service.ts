@@ -46,8 +46,7 @@ export class BookDalService {
     return this.getBookById(id);
   }
 
-  public async deleteBook(id: string): Promise<boolean> {
-    const result = await this.bookRepository.delete(id);
-    return result.affected > 0;
+  public async deleteBook(id: string): Promise<void> {
+    await this.bookRepository.delete(id);
   }
 }

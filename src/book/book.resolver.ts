@@ -3,11 +3,18 @@ import { BookModel, FullBookModel } from './types/book.model';
 import { CreateBookDto, UpdateBookDto } from './types/book.dto';
 import { BookService } from './services/book.service';
 import { BookSortingArgs } from './types/book-sorting.args';
+import { UseGuards } from '@nestjs/common';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Role } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../db/entities/user.entity';
+import { GqlAuthGuard } from '../auth/guards/gql-auth.guard';
 
 @Resolver(() => BookModel)
 export class BookResolver {
   constructor( private readonly bookService: BookService) {}
 
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Role(UserRole.AUTHOR)
   @Mutation(() => FullBookModel)
   public async createBook(@Args('data') data: CreateBookDto) {
     return this.bookService.createBook(data);
@@ -31,8 +38,9 @@ export class BookResolver {
     return this.bookService.updateBook(id, data);
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => String)
   async deleteBook(@Args('id') id: string) {
-    return this.bookService.deleteBook(id);
+    await this.bookService.deleteBook(id);
+    return 'Book was deleted'
   }
 }

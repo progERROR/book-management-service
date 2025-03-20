@@ -8,6 +8,8 @@ import { BookModel, FullBookModel } from '../types/book.model';
 import { BookSortingArgs } from '../types/book-sorting.args';
 import { Review } from '../../dynamodb/schemas/review.schema';
 import Book from '../../db/entities/book.entity';
+import { ReviewModel } from '../types/review.model';
+import { CreateReviewParams } from '../types/review.dto';
 
 @Injectable()
 export class BookService {
@@ -53,11 +55,11 @@ export class BookService {
   public async getBookById(bookId: string): Promise<FullBookModel> {
     try {
       const bookFromCache = await this.redisService.get(bookId);
-      if(bookFromCache) return JSON.parse(bookFromCache);
+      if (bookFromCache) return JSON.parse(bookFromCache);
 
       const book = await this.bookDalService.getBookById(bookId);
 
-      if(!book) throw new NotFoundException(`There is no book under ${bookId} id`)
+      if (!book) throw new NotFoundException(`There is no book under ${bookId} id`)
 
       const content = await this.awsS3Service.getFileContent(book.contentReference);
       const getReviewsByBookIdResponse = await this.reviewDalService.getReviewsByBookId(bookId);
@@ -80,7 +82,12 @@ export class BookService {
     return this.bookDalService.updateBook(id, updateBookDto);
   }
 
-  public async deleteBook(id: string): Promise<boolean> {
-    return this.bookDalService.deleteBook(id);
+  public async deleteBook(id: string): Promise<void> {
+    await this.bookDalService.deleteBook(id);
+  }
+
+  public async addReview(reviewData: CreateReviewParams): Promise<ReviewModel> {
+    const createReviewResponse = await this.reviewDalService.createReview(reviewData);
+    return createReviewResponse.toJSON() as ReviewModel;
   }
 }

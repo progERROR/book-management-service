@@ -5,16 +5,17 @@ import { RedisModule } from '../redis/redis.module';
 import { BookService } from './services/book.service';
 import { BookDalService } from './services/book-dal.service';
 import { ReviewDalService } from './services/review-dal.service';
-import User from '../db/entities/user.entity';
 import Book from '../db/entities/book.entity';
 import { UtilsModule } from '../utils/utils.module';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { ReviewSchema } from '../dynamodb/schemas/review.schema';
 import { BookResolver } from './book.resolver';
+import { ReviewResolver } from './review.resolver';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Book]),
+    TypeOrmModule.forFeature([Book]),
     ConfigModule,
     RedisModule,
     UtilsModule,
@@ -24,7 +25,15 @@ import { BookResolver } from './book.resolver';
       options: {
         tableName: 'review',
       },
-    }]),],
-  providers: [BookService, BookDalService, ReviewDalService, BookResolver],
+    }]),
+    AuthModule,
+  ],
+  providers: [
+    BookService,
+    BookDalService,
+    ReviewDalService,
+    BookResolver,
+    ReviewResolver,
+  ],
 })
 export class BookModule {}

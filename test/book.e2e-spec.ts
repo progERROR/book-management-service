@@ -5,6 +5,7 @@ import { AppModule } from '../src/app.module';
 describe('BookResolver (e2e)', () => {
   const request = require('supertest');
   let app: INestApplication;
+  let jwtToken: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -13,6 +14,19 @@ describe('BookResolver (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    const loginResponse = await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: `
+          mutation {
+            login(username: "username", password: "password")
+          }
+        `,
+      })
+      .expect(200);
+
+    jwtToken = loginResponse.body.data.login;
   });
 
   afterAll(async () => {
@@ -42,6 +56,7 @@ describe('BookResolver (e2e)', () => {
 
     const response = await request(app.getHttpServer())
       .post(gql)
+      .set('Authorization', `Bearer ${jwtToken}`)
       .send({ query: createBookMutation });
 
     expect(response.status).toBe(200);

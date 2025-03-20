@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Item, Model } from 'nestjs-dynamoose';
 import { Review, ReviewKey } from '../../dynamodb/schemas/review.schema';
+import { CreateReviewParams } from '../types/review.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ReviewDalService {
@@ -9,8 +11,11 @@ export class ReviewDalService {
     private reviewModel: Model<Review, ReviewKey>,
   ) {}
 
-  public async createReview(review: Review): Promise<Item<Review>> {
-    return this.reviewModel.create(review);
+  public async createReview(review: CreateReviewParams): Promise<Item<Review>> {
+    return this.reviewModel.create({
+      ...review,
+      id: uuidv4(),
+    });
   }
 
   public async getReviewsByBookId(bookId: string): Promise<Item<Review>[]> {
